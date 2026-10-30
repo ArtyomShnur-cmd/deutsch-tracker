@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deutschkurs: посещаемость</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d1d1b;--mu:#6b6a64;--bd:#e3e1d8;--ok:#2e8b57;--wa:#d98e04;--er:#d6362b;--ac:#1f5fbf;--hol:#ecebe6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151514;--card:#212120;--tx:#f0efe9;--mu:#9a988f;--bd:#33332f;--ok:#4cc27f;--wa:#f0b429;--er:#ff6b5e;--ac:#6ea3ff;--hol:#2a2a28}}
+:root[data-theme="dark"]{--bg:#151514;--card:#212120;--tx:#f0efe9;--mu:#9a988f;--bd:#33332f;--ok:#4cc27f;--wa:#f0b429;--er:#ff6b5e;--ac:#6ea3ff;--hol:#2a2a28}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:480px;margin:0 auto;padding:16px 16px 260px}
+h1{font-size:20px;margin:4px 0 14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.big{font-size:40px;font-weight:700;line-height:1}
+.mu{color:var(--mu);font-size:14px}
+.bar{height:14px;background:var(--bd);border-radius:7px;overflow:hidden;margin:12px 0 6px}
+.bar>i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+button,input{font:inherit;border-radius:10px;border:1px solid var(--bd);padding:10px;background:var(--card);color:var(--tx)}
+button{cursor:pointer;font-weight:600}
+.stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)}
+.stat:last-child{border:0}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.grid .h{text-align:center;font-size:12px;color:var(--mu)}
+.c{aspect-ratio:1;border-radius:8px;border:1px solid var(--bd);padding:2px 3px;font-size:13px;position:relative;cursor:pointer;background:var(--card);color:var(--tx);font-weight:400;text-align:left;display:flex;flex-direction:column;justify-content:space-between}
+.c small{font-size:10px;color:var(--mu);align-self:flex-end}
+.c.off{background:var(--hol);color:var(--mu);border-color:transparent;cursor:default}
+.c.hol{background:repeating-linear-gradient(45deg,var(--hol),var(--hol) 4px,transparent 4px,transparent 8px);border-color:transparent;cursor:default;color:var(--mu)}
+.c.a{background:var(--ok);color:#fff;border-color:var(--ok)}.c.a small{color:#fff}
+.c.m{background:var(--er);color:#fff;border-color:var(--er)}.c.m small{color:#fff}
+.c.p{background:var(--wa);color:#fff;border-color:var(--wa)}.c.p small{color:#fff}
+.c.x{background:var(--ac);color:#fff;border-color:var(--ac)}.c.x small{color:#fff}
+.c.today{outline:2px solid var(--tx)}
+.c.sel{box-shadow:0 0 0 3px var(--ac)}
+.leg{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:12px;color:var(--mu)}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+#sheet{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:none;box-shadow:0 -4px 16px rgba(0,0,0,.15)}
+#sheet .in{max-width:480px;margin:0 auto}
+.r{display:flex;gap:8px;margin-top:8px}.r>*{flex:1}
+</style></head><body>
+<main>
+<h1>🇩🇪 Deutschkurs: посещаемость</h1>
+<div class="card">
+  <label class="mu" for="st">Дата начала курса</label>
+  <input type="date" id="st" style="width:100%;margin-top:6px">
+  <div class="mu" id="endinfo" style="margin-top:8px"></div>
+  <div class="mu" id="sv" style="margin-top:6px;font-size:12px"></div>
+</div>
+<div id="app" style="display:none">
+<div class="card">
+  <div class="mu">Пропущено</div>
+  <div class="big"><span id="ue">0</span> <span class="mu" style="font-size:18px">из 120 УЕ</span></div>
+  <div class="bar"><i id="fill"></i></div>
+  <div id="msg" style="font-weight:600"></div>
+</div>
+<div class="card" id="stats"></div>
+<div class="card"><b>Календарь</b>
+  <div class="leg" style="margin-top:6px"><span><i style="background:var(--ok)"></i>был</span><span><i style="background:var(--er)"></i>пропуск</span><span><i style="background:var(--wa)"></i>частично</span><span><i style="background:var(--ac)"></i>отмена (не по моей вине)</span><span><i style="background:var(--hol)"></i>каникулы/выходной</span></div>
+  <div class="mu" style="margin-top:6px">Цифра в углу — номер учебного дня из 100. Нажми на день, чтобы отметить.</div>
+  <div id="cal"></div>
+  <button id="bulk" style="width:100%;margin-top:12px">Прошлые неотмеченные дни → «был»</button>
+</div>
+</div>
+<div class="card"><b>Резервная копия</b>
+  <div class="mu" style="margin-top:4px">Скопируй текст и сохрани в заметках — им можно восстановить данные на другом телефоне или после очистки браузера.</div>
+  <textarea id="bk" rows="3" style="width:100%;margin-top:8px;font:12px monospace;border-radius:10px;border:1px solid var(--bd);padding:8px;background:var(--card);color:var(--tx)"></textarea>
+  <div class="r"><button id="exp">Показать копию</button><button id="imp">Восстановить из текста</button></div></div>
+<p class="mu">1 день = 3 часа = 4 УЕ. Лимит 30% = 120 УЕ; при достижении ровно 120 УЕ — отчисление. Дни отмены занятий не считаются ни пропуском, ни учебным днём, конец курса сдвигается. Данные хранятся только в этом браузере.</p>
+</main>
+<div id="sheet"><div class="in">
+  <b id="sd"></b>
+  <div class="r"><button id="b_a">✅ Был</button><button id="b_m">❌ Пропуск (4 УЕ)</button></div>
+  <div class="r"><input type="number" id="pn" min="1" max="3" value="1" inputmode="numeric" aria-label="УЕ"><button id="b_p" style="flex:3">Частично пропустил (УЕ, 1–3)</button></div>
+  <div class="r"><button id="b_x">🚫 Занятий не было (не по моей вине)</button></div>
+  <div class="r"><button id="b_r">Сбросить</button><button id="b_c">Закрыть</button></div>
+</div></div>
+<script>
+var KEY="dk2",LIMIT=120,NDAYS=100,HOL=[["2026-12-21","2027-01-03"],["2027-03-29","2027-04-02"]];
+var S={start:"",days:{}},sel=null;
+var MN=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+function $(i){return document.getElementById(i)}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parse(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+function fmt(s){return s.split("-").reverse().join(".")}
+function isHol(s){return HOL.some(function(h){return s>=h[0]&&s<=h[1]})}
+function isWork(d){var w=d.getDay();return w>0&&w<6&&!isHol(iso(d))}
+var okStore=true,DRE=/^\d{4}-\d{2}-\d{2}$/;
+function clean(o){var r={start:"",days:{}};if(o&&typeof o.start=="string"&&DRE.test(o.start))r.start=o.start;
+ if(o&&o.days&&typeof o.days=="object")Object.keys(o.days).forEach(function(k){var m=o.days[k];
+  if(DRE.test(k)&&m){if(m.s=="a"||m.s=="x")r.days[k]={s:m.s};else if(m.s=="m"&&m.ue>=1&&m.ue<=4)r.days[k]={s:"m",ue:Math.round(m.ue)}}});return r}
+function load(){try{var r=localStorage.getItem(KEY);if(r){S=clean(JSON.parse(r));return}
+ var old=JSON.parse(localStorage.getItem("dk_absences")||"[]");
+ old.forEach(function(x){S.days[x.d]={s:"m",ue:x.ue}});S=clean(S)}catch(e){okStore=false}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));okStore=true}catch(e){okStore=false}showSv()}
+function showSv(){var e=$("sv");if(!e)return;e.textContent=okStore?"💾 Всё сохраняется в браузере автоматически":"⚠️ Браузер не разрешает сохранять данные (приватный режим?) — после закрытия страницы всё пропадёт. Используй резервную копию внизу.";e.style.color=okStore?"var(--mu)":"var(--er)"}
+function plural(n,a,b,c){var m=n%10,h=n%100;if(h>10&&h<15)return c;if(m==1)return a;if(m>1&&m<5)return b;return c}
+function plan(){
+  var map={},end=null,cnt=0,d=parse(S.start),i=0;
+  while(cnt<NDAYS&&i<800){var k=iso(d);
+    if(isWork(d)){var m=S.days[k];if(m&&m.s=="x")map[k]=0;else{cnt++;map[k]=cnt;if(cnt==NDAYS)end=k}}
+    d.setDate(d.getDate()+1);i++}
+  return {map:map,end:end};
+}
+function render(){
+  $("st").value=S.start;
+  if(!S.start){$("app").style.display="none";$("endinfo").textContent="Укажи, когда начался курс — построю календарь на 100 учебных дней.";return}
+  $("app").style.display="block";
+  var P=plan(),today=iso(new Date()),absUE=0,att=0,canc=0,past=0,unm=0,done=0;
+  Object.keys(P.map).forEach(function(k){var m=S.days[k],n=P.map[k];
+    if(n>0&&k<=today){past++;if(!m)unm++}
+    if(n>0&&k<today)done++;
+  });
+  Object.keys(S.days).forEach(function(k){var m=S.days[k];
+    if(m.s=="m")absUE+=m.ue;else if(m.s=="a")att++;else if(m.s=="x")canc++});
+  var left=Math.max(LIMIT-1-absUE,0);
+  $("endinfo").textContent=P.end?"Конец курса (по плану): "+fmt(P.end)+". Отмен занятий: "+canc+".":"";
+  $("ue").textContent=absUE;
+  var p=Math.min(absUE/LIMIT*100,100),f=$("fill"),c="var(--ok)",m="Всё спокойно 👍";
+  if(absUE>=LIMIT){c="var(--er)";m="⛔ Лимит достигнут — отчисление!"}
+  else if(left<=8){c="var(--er)";m="🚨 Критично! Осталось "+left+" УЕ до отчисления"}
+  else if(p>=60){c="var(--wa)";m="⚠️ Осторожно, пропусков уже много"}
+  f.style.width=p+"%";f.style.background=c;$("msg").textContent=m;$("msg").style.color=c;
+  var dd=+(absUE/4).toFixed(2),ld=Math.floor(left/4),total=NDAYS;
+  var rows=[["Пропущено дней (по 4 УЕ)",dd],["Пропущено реальных часов",(absUE*0.75).toString().replace(".",",")+" ч"],
+   ["Процент от 400 УЕ",(absUE/4).toFixed(1).replace(".",",")+"%"],
+   ["Можно ещё пропустить",left+" УЕ (≈"+ld+" "+plural(ld,"день","дня","дней")+")"],
+   ["Посещено дней",att],["Учебных дней прошло / всего",done+" / "+total],["Не отмечено (до сегодня)",unm]];
+  $("stats").innerHTML=rows.map(function(r){return '<div class="stat"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join("");
+  var first=parse(S.start),last=P.end?parse(P.end):new Date(first.getFullYear(),first.getMonth()+6,0),h="";
+  var y=first.getFullYear(),mo=first.getMonth();
+  while(y<last.getFullYear()||(y==last.getFullYear()&&mo<=last.getMonth())){
+    var cd=0,ca=0;
+    var dim=new Date(y,mo+1,0).getDate(),off=(new Date(y,mo,1).getDay()+6)%7,cells="";
+    for(var i=0;i<off;i++)cells+='<div></div>';
+    for(var dn=1;dn<=dim;dn++){var dt=new Date(y,mo,dn),k=iso(dt),n=P.map[k],st=S.days[k],cl="c",lab="";
+      if(isHol(k))cl+=" hol";
+      else if(!isWork(dt)||n===undefined)cl+=" off";
+      else{lab=n>0?n:"";if(st){cl+=" "+(st.s=="m"&&st.ue<4?"p":st.s)}
+        if(n>0){cd++;if(st&&st.s=="m")ca+=st.ue}}
+      if(k==today)cl+=" today";if(k==sel)cl+=" sel";
+      cells+='<button class="'+cl+'" data-d="'+k+'">'+dn+'<small>'+lab+'</small></button>'}
+    h+='<div style="margin-top:14px"><b>'+MN[mo]+' '+y+'</b> <span class="mu">· учебных дней: '+cd+' ('+cd*4+' УЕ), пропуск: '+ca+' УЕ</span></div><div class="grid">'+["Пн","Вт","Ср","Чт","Пт","Сб","Вс"].map(function(x){return '<div class="h">'+x+'</div>'}).join("")+cells+'</div>';
+    mo++;if(mo>11){mo=0;y++}}
+  $("cal").innerHTML=h;
+  var cs=document.querySelectorAll(".c[data-d]");
+  for(var j=0;j<cs.length;j++)(function(b){if(b.classList.contains("off")||b.classList.contains("hol"))return;
+    b.onclick=function(){sel=b.getAttribute("data-d");$("sd").textContent=fmt(sel);$("sheet").style.display="block";render()}})(cs[j]);
+}
+function setD(v){if(!sel)return;if(v)S.days[sel]=v;else delete S.days[sel];save();render()}
+$("st").onchange=function(){S.start=this.value;save();render()};
+$("b_a").onclick=function(){setD({s:"a"})};
+$("b_m").onclick=function(){setD({s:"m",ue:4})};
+$("b_p").onclick=function(){var n=parseInt($("pn").value,10);if(n>=1&&n<=3)setD({s:"m",ue:n})};
+$("b_x").onclick=function(){setD({s:"x"})};
+$("b_r").onclick=function(){setD(null)};
+$("b_c").onclick=function(){sel=null;$("sheet").style.display="none";render()};
+$("bulk").onclick=function(){var P=plan(),t=iso(new Date());Object.keys(P.map).forEach(function(k){if(P.map[k]>0&&k<t&&!S.days[k])S.days[k]={s:"a"}});save();render()};
+$("exp").onclick=function(){$("bk").value=JSON.stringify(S)};
+$("imp").onclick=function(){try{S=clean(JSON.parse($("bk").value));save();render()}catch(e){$("bk").value="Ошибка: неверный текст копии"}};
+window.addEventListener("pagehide",save);
+document.addEventListener("visibilitychange",function(){if(document.hidden)save()});
+window.addEventListener("storage",function(e){if(e.key==KEY){load();render()}});
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+load();render();showSv();
+</script></body></html>
