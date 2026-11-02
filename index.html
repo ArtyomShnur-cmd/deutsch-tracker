@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deutschkurs</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d1d1b;--mu:#6b6a64;--bd:#e3e1d8;--ok:#2e8b57;--wa:#d98e04;--er:#d6362b;--ac:#1f5fbf;--hol:#ecebe6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151514;--card:#212120;--tx:#f0efe9;--mu:#9a988f;--bd:#33332f;--ok:#4cc27f;--wa:#f0b429;--er:#ff6b5e;--ac:#6ea3ff;--hol:#2a2a28}}
+:root[data-theme="dark"]{--bg:#151514;--card:#212120;--tx:#f0efe9;--mu:#9a988f;--bd:#33332f;--ok:#4cc27f;--wa:#f0b429;--er:#ff6b5e;--ac:#6ea3ff;--hol:#2a2a28}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:480px;margin:0 auto;padding:16px 16px 260px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 14px}
+h1{font-size:19px;margin:0}
+.lg{display:flex;gap:4px}.lg button{padding:6px 8px;font-size:13px}.lg button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.big{font-size:40px;font-weight:700;line-height:1}
+.mu{color:var(--mu);font-size:14px}
+.barw{position:relative;margin:12px 0 4px}
+.bar{height:14px;background:var(--bd);border-radius:7px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.tk{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--tx);opacity:.5}
+.tl{position:relative;height:16px;font-size:11px;color:var(--mu);margin-bottom:6px}.tl span{position:absolute;transform:translateX(-50%)}
+#msg{font-weight:600;border-left:4px solid var(--ok);padding:6px 10px;border-radius:6px}
+#msg.zy{background:rgba(217,142,4,.14)}#msg.zo{background:rgba(240,122,26,.15)}#msg.zr{background:rgba(214,54,43,.17)}
+button,input{font:inherit;border-radius:10px;border:1px solid var(--bd);padding:10px;background:var(--card);color:var(--tx)}
+button{cursor:pointer;font-weight:600}
+.stat{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)}
+.stat:last-child{border:0}.stat b{text-align:right}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.grid .h{text-align:center;font-size:12px;color:var(--mu)}
+.c{aspect-ratio:1;border-radius:8px;border:1px solid var(--bd);padding:2px 3px;font-size:13px;cursor:pointer;background:var(--card);color:var(--tx);font-weight:400;text-align:left;display:flex;flex-direction:column;justify-content:space-between}
+.c small{font-size:10px;color:var(--mu);align-self:flex-end}
+.c.off{background:var(--hol);color:var(--mu);border-color:transparent;cursor:default}
+.c.hol{background:repeating-linear-gradient(45deg,var(--hol),var(--hol) 4px,transparent 4px,transparent 8px);border-color:transparent;cursor:default;color:var(--mu)}
+.c.a{background:var(--ok);color:#fff;border-color:var(--ok)}.c.m{background:var(--er);color:#fff;border-color:var(--er)}
+.c.p{background:var(--wa);color:#fff;border-color:var(--wa)}.c.x{background:var(--ac);color:#fff;border-color:var(--ac)}
+.c.a small,.c.m small,.c.p small,.c.x small{color:#fff}
+.c.today{outline:2px solid var(--tx)}.c.sel{box-shadow:0 0 0 3px var(--ac)}
+.leg{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:12px;color:var(--mu)}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+#sheet{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:none;box-shadow:0 -4px 16px rgba(0,0,0,.15)}
+#sheet .in{max-width:480px;margin:0 auto}
+.r{display:flex;gap:8px;margin-top:8px}.r>*{flex:1}
+</style></head><body>
+<main>
+<div class="hd"><h1>🇩🇪 <span data-t="title"></span></h1>
+<div class="lg"><button data-l="ru">RU</button><button data-l="uk">UA</button><button data-l="de">DE</button></div></div>
+<div class="card">
+  <label class="mu" for="st" data-t="start"></label>
+  <input type="date" id="st" style="width:100%;margin-top:6px">
+  <div class="mu" id="endinfo" style="margin-top:8px"></div>
+  <div class="mu" id="sv" style="margin-top:6px;font-size:12px"></div>
+</div>
+<div id="app" style="display:none">
+<div class="card">
+  <div class="mu" data-t="missed"></div>
+  <div class="big"><span id="ue">0</span> <span class="mu" style="font-size:18px" data-t="of"></span></div>
+  <div class="barw"><div class="bar"><i id="fill"></i></div><b class="tk" style="left:50%"></b></div>
+  <div class="tl"><span style="left:50%">15%</span><span style="right:0;transform:none">30%</span></div>
+  <div id="msg"></div>
+</div>
+<div class="card" id="stats"></div>
+<div class="card"><b data-t="cal"></b>
+  <div class="leg" style="margin-top:6px"><span><i style="background:var(--ok)"></i><span data-t="l1"></span></span><span><i style="background:var(--er)"></i><span data-t="l2"></span></span><span><i style="background:var(--wa)"></i><span data-t="l3"></span></span><span><i style="background:var(--ac)"></i><span data-t="l4"></span></span><span><i style="background:var(--hol)"></i><span data-t="l5"></span></span></div>
+  <div class="mu" style="margin-top:6px" data-t="hint"></div>
+  <div id="cal"></div>
+  <button id="bulk" style="width:100%;margin-top:12px" data-t="bulk"></button>
+</div>
+</div>
+<div class="card"><b data-t="bk"></b>
+  <div class="mu" style="margin-top:4px" data-t="bkd"></div>
+  <textarea id="bk" rows="3" style="width:100%;margin-top:8px;font:12px monospace;border-radius:10px;border:1px solid var(--bd);padding:8px;background:var(--card);color:var(--tx)"></textarea>
+  <div class="r"><button id="exp" data-t="exp"></button><button id="imp" data-t="imp"></button></div></div>
+<p class="mu" data-t="foot"></p>
+</main>
+<div id="sheet"><div class="in">
+  <b id="sd"></b>
+  <div class="r"><button id="b_a" data-t="ba"></button><button id="b_m" data-t="bm"></button></div>
+  <div class="r"><input type="number" id="pn" min="1" max="3" value="1" inputmode="numeric" aria-label="UE"><button id="b_p" style="flex:3" data-t="bp"></button></div>
+  <div class="r"><button id="b_x" data-t="bx"></button></div>
+  <div class="r"><button id="b_r" data-t="br"></button><button id="b_c" data-t="bc"></button></div>
+</div></div>
+<script>
+var KEY="dk2",LK="dk_lang",LIMIT=120,ZY=40,ZF=60,ZO=80,ZR=100,NDAYS=100,HOL=[["2026-12-21","2027-01-03"],["2027-03-29","2027-04-02"]];
+var S={start:"",days:{}},sel=null,okStore=true,DRE=/^\d{4}-\d{2}-\d{2}$/;
+var T={
+ru:{title:"Deutschkurs: посещаемость",start:"Дата начала курса",nostart:"Укажи, когда начался курс — построю календарь на 100 учебных дней.",end:"Конец курса (по плану): ",canc:"Отмен занятий: ",missed:"Пропущено",of:"из 120 УЕ",
+st:["Пропущено дней (по 4 УЕ)","Пропущено реальных часов","Процент от 400 УЕ","Можно ещё пропустить","Посещено дней","Учебных дней прошло / всего","Не отмечено (до сегодня)"],hu:" ч",ue:"УЕ",days:["день","дня","дней"],
+cal:"Календарь",l1:"был",l2:"пропуск",l3:"частично",l4:"отмена (не по моей вине)",l5:"каникулы/выходной",hint:"Цифра в углу — номер учебного дня из 100. Нажми на день, чтобы отметить.",bulk:"Прошлые неотмеченные дни → «был»",
+mi:"учебных дней: {c} ({u} УЕ), пропуск: {a} УЕ",ba:"✅ Был",bm:"❌ Пропуск (4 УЕ)",bp:"Частично пропустил (УЕ, 1–3)",bx:"🚫 Занятий не было (не по моей вине)",br:"Сбросить",bc:"Закрыть",
+bk:"Резервная копия",bkd:"Сохрани текст в заметках, чтобы восстановить данные.",exp:"Показать копию",imp:"Восстановить из текста",err:"Ошибка: неверный текст копии",
+foot:"1 день = 3 ч = 4 УЕ. 30% (120 УЕ) — отчисление. Отмены занятий пропуском не считаются. Данные хранятся только в этом браузере.",
+sv1:"💾 Всё сохраняется в браузере автоматически",sv0:"⚠️ Браузер не разрешает сохранять данные (приватный режим?) — после закрытия страницы всё пропадёт. Используй резервную копию внизу.",
+m0:"Всё спокойно 👍",m1:"⚠️ Пропущено {p}% — до 15% близко. Осталось {n} УЕ{x}.",m15:"⚠️ Отметка 15% пройдена: {p}%. Осталось {n} УЕ{x}. Не пропускай без нужды!",m2:"🟠 Пропущено {p}%! Осталось всего {n} УЕ{x}. Любой пропуск — риск вылета.",mr:"🚨 {p}%! До отчисления {n} УЕ{x}. Один шаг до вылета — иди на каждый урок!",m3:"⛔ Лимит достигнут — отчисление!",
+mo:["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],wd:["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]},
+uk:{title:"Deutschkurs: відвідуваність",start:"Дата початку курсу",nostart:"Вкажи, коли почався курс — побудую календар на 100 навчальних днів.",end:"Кінець курсу (за планом): ",canc:"Скасувань занять: ",missed:"Пропущено",of:"з 120 УЕ",
+st:["Пропущено днів (по 4 УЕ)","Пропущено реальних годин","Відсоток від 400 УЕ","Можна ще пропустити","Відвідано днів","Навчальних днів минуло / всього","Не позначено (до сьогодні)"],hu:" год",ue:"УЕ",days:["день","дні","днів"],
+cal:"Календар",l1:"був",l2:"пропуск",l3:"частково",l4:"скасування (не з моєї вини)",l5:"канікули/вихідний",hint:"Цифра в куті — номер навчального дня зі 100. Натисни на день, щоб позначити.",bulk:"Минулі непозначені дні → «був»",
+mi:"навчальних днів: {c} ({u} УЕ), пропуск: {a} УЕ",ba:"✅ Був",bm:"❌ Пропуск (4 УЕ)",bp:"Частково пропустив (УЕ, 1–3)",bx:"🚫 Занять не було (не з моєї вини)",br:"Скинути",bc:"Закрити",
+bk:"Резервна копія",bkd:"Збережи текст у нотатках, щоб відновити дані.",exp:"Показати копію",imp:"Відновити з тексту",err:"Помилка: неправильний текст копії",
+foot:"1 день = 3 год = 4 УЕ. 30% (120 УЕ) — відрахування. Скасування занять пропуском не рахуються. Дані зберігаються лише в цьому браузері.",
+sv1:"💾 Усе зберігається в браузері автоматично",sv0:"⚠️ Браузер не дозволяє зберігати дані (приватний режим?) — після закриття сторінки все зникне. Скористайся резервною копією внизу.",
+m0:"Усе спокійно 👍",m1:"⚠️ Пропущено {p}% — до 15% близько. Лишилось {n} УЕ{x}.",m15:"⚠️ Позначку 15% пройдено: {p}%. Лишилось {n} УЕ{x}. Не пропускай без потреби!",m2:"🟠 Пропущено {p}%! Лишилось лише {n} УЕ{x}. Будь-який пропуск — ризик вильоту.",mr:"🚨 {p}%! До відрахування {n} УЕ{x}. Крок до вильоту — іди на кожен урок!",m3:"⛔ Ліміт досягнуто — відрахування!",
+mo:["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"],wd:["Пн","Вт","Ср","Чт","Пт","Сб","Нд"]},
+de:{title:"Deutschkurs: Anwesenheit",start:"Kursbeginn",nostart:"Gib den Kursbeginn an — ich erstelle den Kalender für 100 Unterrichtstage.",end:"Kursende (laut Plan): ",canc:"Ausgefallene Tage: ",missed:"Gefehlt",of:"von 120 UE",
+st:["Gefehlte Tage (je 4 UE)","Gefehlte Echtstunden","Anteil an 400 UE","Darfst noch fehlen","Besuchte Tage","Unterrichtstage vergangen / gesamt","Nicht markiert (bis heute)"],hu:" Std.",ue:"UE",days:["Tag","Tage","Tage"],
+cal:"Kalender",l1:"da",l2:"gefehlt",l3:"teilweise",l4:"Ausfall (nicht meine Schuld)",l5:"Ferien/frei",hint:"Zahl in der Ecke = Unterrichtstag von 100. Tippe auf einen Tag zum Markieren.",bulk:"Vergangene unmarkierte Tage → „da“",
+mi:"Unterrichtstage: {c} ({u} UE), gefehlt: {a} UE",ba:"✅ Da",bm:"❌ Gefehlt (4 UE)",bp:"Teilweise gefehlt (UE, 1–3)",bx:"🚫 Unterricht fiel aus (nicht meine Schuld)",br:"Zurücksetzen",bc:"Schließen",
+bk:"Sicherungskopie",bkd:"Text in den Notizen speichern, um Daten wiederherzustellen.",exp:"Kopie anzeigen",imp:"Aus Text wiederherstellen",err:"Fehler: ungültiger Kopietext",
+foot:"1 Tag = 3 Std. = 4 UE. 30 % (120 UE) = Ausschluss. Ausfalltage zählen nicht als Fehlzeit. Daten werden nur in diesem Browser gespeichert.",
+sv1:"💾 Alles wird automatisch im Browser gespeichert",sv0:"⚠️ Der Browser erlaubt kein Speichern (privater Modus?) – nach dem Schließen sind die Daten weg. Nutze die Sicherungskopie unten.",
+m0:"Alles ruhig 👍",m1:"⚠️ {p} % gefehlt – 15 % sind nah. Noch {n} UE{x}.",m15:"⚠️ 15 % überschritten: {p} %. Noch {n} UE{x}. Fehle nicht ohne Grund!",m2:"🟠 {p} % gefehlt! Nur noch {n} UE{x}. Jeder Fehltag riskiert den Rauswurf.",mr:"🚨 {p} %! Bis zum Ausschluss {n} UE{x}. Ein Schritt vor dem Rauswurf – geh zu jedem Unterricht!",m3:"⛔ Grenze erreicht – Ausschluss!",
+mo:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],wd:["Mo","Di","Mi","Do","Fr","Sa","So"]}};
+var L="de";
+try{var sl=localStorage.getItem(LK);if(T[sl])L=sl;}catch(e){}
+function $(i){return document.getElementById(i)}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parse(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+function fmt(s){return s.split("-").reverse().join(".")}
+function isHol(s){return HOL.some(function(h){return s>=h[0]&&s<=h[1]})}
+function isWork(d){var w=d.getDay();return w>0&&w<6&&!isHol(iso(d))}
+function pl(n,f){if(L=="de")return n==1?f[0]:f[1];var m=n%10,h=n%100;if(h>10&&h<15)return f[2];if(m==1)return f[0];if(m>1&&m<5)return f[1];return f[2]}
+function tpl(s,o){return s.replace(/\{(\w+)\}/g,function(_,k){return o[k]})}
+function clean(o){var r={start:"",days:{}};if(o&&typeof o.start=="string"&&DRE.test(o.start))r.start=o.start;
+ if(o&&o.days&&typeof o.days=="object")Object.keys(o.days).forEach(function(k){var m=o.days[k];
+  if(DRE.test(k)&&m){if(m.s=="a"||m.s=="x")r.days[k]={s:m.s};else if(m.s=="m"&&m.ue>=1&&m.ue<=4)r.days[k]={s:"m",ue:Math.round(m.ue)}}});return r}
+function load(){try{var r=localStorage.getItem(KEY);if(r){S=clean(JSON.parse(r));return}
+ var old=JSON.parse(localStorage.getItem("dk_absences")||"[]");
+ old.forEach(function(x){S.days[x.d]={s:"m",ue:x.ue}});S=clean(S)}catch(e){okStore=false}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));okStore=true}catch(e){okStore=false}showSv()}
+function showSv(){var e=$("sv");e.textContent=okStore?T[L].sv1:T[L].sv0;e.style.color=okStore?"var(--mu)":"var(--er)"}
+function plan(){
+  var map={},end=null,cnt=0,d=parse(S.start),i=0;
+  while(cnt<NDAYS&&i<800){var k=iso(d);
+    if(isWork(d)){var m=S.days[k];if(m&&m.s=="x")map[k]=0;else{cnt++;map[k]=cnt;if(cnt==NDAYS)end=k}}
+    d.setDate(d.getDate()+1);i++}
+  return {map:map,end:end};
+}
+function applyT(){
+  var t=T[L];document.documentElement.lang=L;document.title=t.title;
+  document.querySelectorAll("[data-t]").forEach(function(e){e.textContent=t[e.getAttribute("data-t")]});
+  document.querySelectorAll("[data-l]").forEach(function(b){b.className=b.getAttribute("data-l")==L?"on":""});
+  showSv();
+}
+function render(){
+  var t=T[L];$("st").value=S.start;
+  if(!S.start){$("app").style.display="none";$("endinfo").textContent=t.nostart;return}
+  $("app").style.display="block";
+  var P=plan(),today=iso(new Date()),absUE=0,att=0,canc=0,unm=0,done=0;
+  Object.keys(P.map).forEach(function(k){var m=S.days[k],n=P.map[k];
+    if(n>0&&k<=today){done++;if(!m)unm++}});
+  Object.keys(S.days).forEach(function(k){var m=S.days[k];
+    if(m.s=="m")absUE+=m.ue;else if(m.s=="a")att++;else if(m.s=="x")canc++});
+  var left=Math.max(LIMIT-1-absUE,0),ld=Math.floor(left/4),pc=(absUE/4).toFixed(1).replace(".",",");
+  $("endinfo").textContent=P.end?t.end+fmt(P.end)+". "+t.canc+canc+".":"";
+  $("ue").textContent=absUE;
+  var f=$("fill"),c="var(--ok)",m=t.m0,cls="",o={p:pc,n:left,x:ld>0?" (≈"+ld+" "+pl(ld,t.days)+")":""};
+  if(absUE>=LIMIT){c="var(--er)";m=t.m3;cls="zr"}
+  else if(absUE>=ZR){c="var(--er)";m=tpl(t.mr,o);cls="zr"}
+  else if(absUE>=ZO){c="#f07a1a";m=tpl(t.m2,o);cls="zo"}
+  else if(absUE>=ZF){c="var(--wa)";m=tpl(t.m15,o);cls="zy"}
+  else if(absUE>=ZY){c="var(--wa)";m=tpl(t.m1,o)}
+  f.style.width=Math.min(absUE/LIMIT*100,100)+"%";f.style.background=c;
+  $("msg").textContent=m;$("msg").style.borderLeftColor=c;$("msg").className=cls;
+  var dd=+(absUE/4).toFixed(2);
+  var v=[dd,(absUE*0.75).toString().replace(".",",")+t.hu,pc+"%",left+" "+t.ue+" (≈"+ld+" "+pl(ld,t.days)+")",att,done+" / "+NDAYS,unm];
+  $("stats").innerHTML=t.st.map(function(r,i){return '<div class="stat"><span>'+r+'</span><b>'+v[i]+'</b></div>'}).join("");
+  var first=parse(S.start),last=P.end?parse(P.end):new Date(first.getFullYear(),first.getMonth()+6,0),h="";
+  var y=first.getFullYear(),mo=first.getMonth();
+  while(y<last.getFullYear()||(y==last.getFullYear()&&mo<=last.getMonth())){
+    var cd=0,ca=0,dim=new Date(y,mo+1,0).getDate(),off=(new Date(y,mo,1).getDay()+6)%7,cells="";
+    for(var i=0;i<off;i++)cells+='<div></div>';
+    for(var dn=1;dn<=dim;dn++){var dt=new Date(y,mo,dn),k=iso(dt),n=P.map[k],st=S.days[k],cl="c",lab="";
+      if(isHol(k))cl+=" hol";
+      else if(!isWork(dt)||n===undefined)cl+=" off";
+      else{lab=n>0?n:"";if(st){cl+=" "+(st.s=="m"&&st.ue<4?"p":st.s)}
+        if(n>0){cd++;if(st&&st.s=="m")ca+=st.ue}}
+      if(k==today)cl+=" today";if(k==sel)cl+=" sel";
+      cells+='<button class="'+cl+'" data-d="'+k+'">'+dn+'<small>'+lab+'</small></button>'}
+    h+='<div style="margin-top:14px"><b>'+t.mo[mo]+' '+y+'</b> <span class="mu">· '+tpl(t.mi,{c:cd,u:cd*4,a:ca})+'</span></div><div class="grid">'+t.wd.map(function(x){return '<div class="h">'+x+'</div>'}).join("")+cells+'</div>';
+    mo++;if(mo>11){mo=0;y++}}
+  $("cal").innerHTML=h;
+  var cs=document.querySelectorAll(".c[data-d]");
+  for(var j=0;j<cs.length;j++)(function(b){if(b.classList.contains("off")||b.classList.contains("hol"))return;
+    b.onclick=function(){sel=b.getAttribute("data-d");$("sd").textContent=fmt(sel);$("sheet").style.display="block";render()}})(cs[j]);
+}
+function setD(v){if(!sel)return;if(v)S.days[sel]=v;else delete S.days[sel];save();render()}
+$("st").onchange=function(){S.start=this.value;save();render()};
+$("b_a").onclick=function(){setD({s:"a"})};
+$("b_m").onclick=function(){setD({s:"m",ue:4})};
+$("b_p").onclick=function(){var n=parseInt($("pn").value,10);if(n>=1&&n<=3)setD({s:"m",ue:n})};
+$("b_x").onclick=function(){setD({s:"x"})};
+$("b_r").onclick=function(){setD(null)};
+$("b_c").onclick=function(){sel=null;$("sheet").style.display="none";render()};
+$("bulk").onclick=function(){var P=plan(),t=iso(new Date());Object.keys(P.map).forEach(function(k){if(P.map[k]>0&&k<t&&!S.days[k])S.days[k]={s:"a"}});save();render()};
+$("exp").onclick=function(){$("bk").value=JSON.stringify(S)};
+$("imp").onclick=function(){try{S=clean(JSON.parse($("bk").value));save();render()}catch(e){$("bk").value=T[L].err}};
+document.querySelectorAll("[data-l]").forEach(function(b){b.onclick=function(){L=b.getAttribute("data-l");try{localStorage.setItem(LK,L)}catch(e){}applyT();render()}});
+window.addEventListener("pagehide",save);
+document.addEventListener("visibilitychange",function(){if(document.hidden)save()});
+window.addEventListener("storage",function(e){if(e.key==KEY){load();render()}});
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+load();applyT();render();
+</script></body></html>
